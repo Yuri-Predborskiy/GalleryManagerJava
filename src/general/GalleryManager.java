@@ -8,7 +8,7 @@ import java.util.List;
 public class GalleryManager {
 	private enum WorkMode { NORMAL, EXPLAIN, FORCE_UPDATE };
 	private static WorkMode mode = WorkMode.NORMAL;
-	static String folder = "images\\";
+	static String fullPath = "images\\";
 	static String relativePath = null;
 	static int size = 600;
 	static boolean questionMode = false;
@@ -25,10 +25,10 @@ public class GalleryManager {
 		}
 		
 		if(relativePath == null) {
-			relativePath = folder;
+			relativePath = fullPath;
 		}
-		ImageList images = new ImageList(folder);
-		ImageList thumbs = new ImageList(ImageList.mode.THUMBNAILS, folder);
+		ImageList images = new ImageList(fullPath);
+		ImageList thumbs = new ImageList(ImageList.mode.THUMBNAILS, fullPath);
 		
 		List<ImagePair> pairs = assignPairs(images, thumbs);
 		
@@ -45,11 +45,11 @@ public class GalleryManager {
 	}
 	
 	private static void parseParameters(String[] args) {
-		String folderPattern = "^fullPath:.+$";
-		String relativeFolderPattern = "^relPath:.+$";
 		String questionPattern = "^(-help)|(/help)$";
-		String updatePattern = "^(-update)|(/update)|(-force)|(/force)$";
+		String folderPattern = "^-fullPath:.+$";
+		String relativeFolderPattern = "^-relPath:.+$";
 		String sizePattern = "^-size:\\d+$";
+		String updatePattern = "^(-update)|(/update)|(-force)|(/force)$";
 		for(String arg : args) {
 			if(arg.matches(questionPattern)) {
 				mode = WorkMode.EXPLAIN;
@@ -62,16 +62,17 @@ public class GalleryManager {
 			
 			if(arg.matches(folderPattern))
 			{
-				folder = arg.substring(9);
-				if(!folder.substring(folder.length()-1, folder.length()).equals("\\")) {
-					folder += "\\";
-					folder = folder.replace("/", "\\");
+				fullPath = arg.substring(10);
+				if(!fullPath.substring(fullPath.length()-1, fullPath.length()).equals("\\")) {
+					fullPath += "\\";
+					
 				}
+				fullPath = fullPath.replace("/", "\\");
 			}
 			
 			if(arg.matches(relativeFolderPattern))
 			{
-				relativePath = arg.substring(8);
+				relativePath = arg.substring(9);
 				if(!relativePath.substring(relativePath.length()-1, relativePath.length()).equals("\\")) {
 					relativePath += "\\";
 				}
@@ -99,13 +100,13 @@ public class GalleryManager {
 		
 		public String createThumbnail(int size) {
 			try {
-				ThumbnailMaker.MakeThumbnail(folder + image, size);
+				ThumbnailMaker.MakeThumbnail(fullPath + image, size);
 			} catch (Exception e) {
 				print("Error making thumbnail of " + image + ": " + e);
 				e.printStackTrace();
 				return null;
 			}
-			File test = new File(folder + "thumbnail-" + image);
+			File test = new File(fullPath + "thumbnail-" + image);
 			if(test.exists()) {
 				thumbnail = test.getName();
 				return thumbnail;
@@ -159,10 +160,10 @@ public class GalleryManager {
 		String thumbnail = pair.getThumbnail();
 		Dimension id;
 		try {
-			id = ImageInfo.getImageDimension(folder + image);
+			id = ImageInfo.getImageDimension(fullPath + image);
 		}
 		catch (Exception e) {
-			print("Error reading image dimensions (" + image + ") " + e);
+			print("Error reading image dimensions (" + image + "), skipping image. " + e);
 			return "";
 		}
 		String tt = "\t\t"; // tab tab
@@ -180,11 +181,11 @@ public class GalleryManager {
 		print("\t allowed parameters (no spaces allowed):\n"
 				+ "-help - "
 				+ "shows available parameters\n"
-				+ "fullPath:\"path/to/images\" - "
+				+ "-fullPath:\"path/to/images\" - "
 				+ "absolute path to image folder\n"
-				+ "relPath:\"path/to/images\" - "
+				+ "-relPath:\"path/to/images\" - "
 				+ "path to image folder from page.html\n"
-				+ "size:300 - "
+				+ "-size:300 - "
 				+ "sets max size in px for image thumbnails\n"
 				+ "-update | -force - "
 				+ "create new thumbnails with current params");
