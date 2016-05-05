@@ -6,9 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GalleryManager {
+	private enum WorkMode { NORMAL, EXPLAIN, FORCE_UPDATE };
+	private static WorkMode mode = WorkMode.NORMAL;
 	static String folder = "images\\";
 	static String relativePath = null;
-	static int size = 450;
+	static int size = 600;
 	static boolean questionMode = false;
 	private static void print(String what) {
 		System.out.println(what);
@@ -17,13 +19,8 @@ public class GalleryManager {
 	public static void main(String[] args) {
 		parseParameters(args);
 		
-		if(questionMode) {
-			// print explanation and stop working
-			print("\t allowed parameters (no spaces allowed):\n"
-					+ "fullPath:\"path/to/images\" - "
-					+ "absolute path to image folder\n"
-					+ "relPath:\"path/to/images\" - "
-					+ "path to image folder from page.html");
+		if(mode == WorkMode.EXPLAIN) {
+			showExplanation();
 			return;
 		}
 		
@@ -51,7 +48,18 @@ public class GalleryManager {
 		String folderPattern = "^fullPath:.+$";
 		String relativeFolderPattern = "^relPath:.+$";
 		String questionPattern = "^(-help)|(/help)$";
+		String updatePattern = "^(-update)|(/update)|(-force)|(/force)$";
+		String sizePattern = "^-size:\\d+$";
 		for(String arg : args) {
+			if(arg.matches(questionPattern)) {
+				mode = WorkMode.EXPLAIN;
+				return;
+			}
+			
+			if(arg.matches(updatePattern)) {
+				mode = WorkMode.FORCE_UPDATE;
+			}
+			
 			if(arg.matches(folderPattern))
 			{
 				folder = arg.substring(9);
@@ -60,6 +68,7 @@ public class GalleryManager {
 					folder = folder.replace("/", "\\");
 				}
 			}
+			
 			if(arg.matches(relativeFolderPattern))
 			{
 				relativePath = arg.substring(8);
@@ -68,9 +77,9 @@ public class GalleryManager {
 				}
 				relativePath = relativePath.replace("\\", "/");
 			}
-			if(arg.matches(questionPattern)) {
-				questionMode = true;
-				return;
+			
+			if(arg.matches(sizePattern)) {
+				size = Integer.parseInt(arg.substring(6), 10);
 			}
 		}
 	}
@@ -119,10 +128,8 @@ public class GalleryManager {
 		List<ImagePair> pairs = new ArrayList<ImagePair>();
 		for(String img : imgList.getImageList()) {
 			String thumb = findThumbnail(img, thumbList);
-			if(!thumb.equals("")) {
-				pairs.add(new ImagePair(img, thumb));
-			} else {
-				// if thumbnail is not found - create it
+			if(thumb.equals("") || mode == WorkMode.FORCE_UPDATE) {
+				// create / overwrite thumbnail
 				ImagePair newPair = new ImagePair(img);
 				if(newPair.createThumbnail(size) != null) {
 					pairs.add(newPair);
@@ -130,6 +137,9 @@ public class GalleryManager {
 					// thumbnail creation failed - skip image
 					print("Failed to create thumbnail for " + img + ", skipping image.");
 				}
+			} else {
+				// thumbnail already exists, mode is not set into force update
+				pairs.add(new ImagePair(img, thumb));
 			}
 		}
 		return pairs;
@@ -163,5 +173,20 @@ public class GalleryManager {
 				+ tt + "\"h\" : " + id.getHeight() + "\n"
 				+ "\t},\n";
 		return json;
+	}
+	
+	// print instructions with available parameters
+	private static void showExplanation() {
+		print("\t allowed parameters (no spaces allowed):\n"
+				+ "-help - "
+				+ "shows available parameters\n"
+				+ "fullPath:\"path/to/images\" - "
+				+ "absolute path to image folder\n"
+				+ "relPath:\"path/to/images\" - "
+				+ "path to image folder from page.html\n"
+				+ "size:300 - "
+				+ "sets max size in px for image thumbnails\n"
+				+ "-update | -force - "
+				+ "create new thumbnails with current params");
 	}
 }
