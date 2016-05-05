@@ -1,0 +1,12 @@
+Manifest-Version: 1.0
+Specification-Title: Thumbnailator sources
+Archiver-Version: Plexus Archiver
+Built-By: coobird
+Build-Jdk: 1.5.0_22
+Created-By: Apache Maven
+Implementation-Title: Thumbnailator sources
+Specification-Vendor: coobird.net
+Specification-Version: 0.4.8
+Implementation-Version: 0.4.8
+Implementation-Vendor: coobird.net
+

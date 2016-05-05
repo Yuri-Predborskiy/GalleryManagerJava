@@ -10,7 +10,7 @@ Launch the app with proper parameters to generate JSON text and write it on scre
 -fullPath:"path/to/images" - specify absolute path to images (if JAR file is in a separate folder) or relative path (if JAR file is in project folder). Default - "images\"<br>
 -relPath:"path/to/images" - specify relative path to images from html file location. Default - same as fullPath<br>
 -size:xxx - sets max size for images, xxx by xxx pixels (keeping aspect ratio)<br>
--update or -force - forces update of thumbnails, overwriting any existing ones (if you want to make new thumbnails with new -size
+-update or -force - forces update of thumbnails, overwriting any existing ones (if you want to make new thumbnails with new size, for example)
 
 Supported image file extensions: JPG, JPEG, PNG
 Thumbnail pattern: thumbnail-image.jpg
