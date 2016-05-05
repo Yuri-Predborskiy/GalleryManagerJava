@@ -9,11 +9,13 @@ Launch the app with proper parameters to generate JSON text and write it on scre
 -help - writes available parameters and quits the app<br>
 -fullPath:"path/to/images" - specify absolute path to images (if JAR file is in a separate folder) or relative path (if JAR file is in project folder). Default - "images\"<br>
 -relPath:"path/to/images" - specify relative path to images from html file location. Default - same as fullPath<br>
+-size:xxx - sets max size for images, xxx by xxx pixels (keeping aspect ratio)<br>
+-update or -force - forces update of thumbnails, overwriting any existing ones (if you want to make new thumbnails with new -size
 
 Supported image file extensions: JPG, JPEG, PNG
 Thumbnail pattern: thumbnail-image.jpg
 If respective thumbnail file is not found, a new file will be generated using Thumbnailator.
-Max size for thumbnails is 450 x 450 px, these will be served on the page.html. Full image will be loaded when user clicks on thumbnail using PhotoSwipe javascript plugin.
+Max size for thumbnails is set with "-size" launch parameter, defaults to 600 x 600 px (keeping aspect ratio), these will be served on the page.html. Full image will be loaded when user clicks on thumbnail using PhotoSwipe javascript plugin.
 
 <ul>This app uses:
 <li><a href="https://github.com/coobird/thumbnailator">Thumbnailator</a></li>
