@@ -45,14 +45,12 @@ public class GalleryManager {
 	}
 	
 	private static void parseParameters(String[] args) {
-		String questionPattern = "^(-|/)help$";
-		String fullPathPattern = "^-(fullPath|path):.+$";
-		String relativePathPattern = "^-relPath:.+$";
+		String questionPattern = "^(-help)|(/help)$";
+		String folderPattern = "^-fullPath:.+$";
+		String relativeFolderPattern = "^-relPath:.+$";
 		String sizePattern = "^-size:\\d+$";
-		String updatePattern = "^(-|/)(update|force)$";
+		String updatePattern = "^(-update)|(/update)|(-force)|(/force)$";
 		for(String arg : args) {
-			String param = arg.substring(arg.indexOf(":")+1);
-			String lastSymbol = param.substring(param.length()-1, param.length());
 			if(arg.matches(questionPattern)) {
 				mode = WorkMode.EXPLAIN;
 				return;
@@ -62,31 +60,29 @@ public class GalleryManager {
 				mode = WorkMode.FORCE_UPDATE;
 			}
 			
-			if(arg.matches(fullPathPattern))
+			if(arg.matches(folderPattern))
 			{
-				fullPath = param;
-				if(!lastSymbol.equals("\\") || !lastSymbol.equals("/")) {
+				fullPath = arg.substring(10);
+				if(!fullPath.substring(fullPath.length()-1, fullPath.length()).equals("\\")) {
 					fullPath += "\\";
+					
 				}
+				fullPath = fullPath.replace("/", "\\");
 			}
 			
-			if(arg.matches(relativePathPattern))
+			if(arg.matches(relativeFolderPattern))
 			{
-				relativePath = param;
-				if(!lastSymbol.equals("\\") || !lastSymbol.equals("/")) {
+				relativePath = arg.substring(9);
+				if(!relativePath.substring(relativePath.length()-1, relativePath.length()).equals("\\")) {
 					relativePath += "\\";
 				}
+				relativePath = relativePath.replace("\\", "/");
 			}
 			
 			if(arg.matches(sizePattern)) {
-				size = Integer.parseInt(param, 10);
+				size = Integer.parseInt(arg.substring(6), 10);
 			}
 		}
-		fullPath = fullPath.replace("/", "\\");
-		if(relativePath == null) {
-			relativePath = fullPath;
-		}
-		relativePath = relativePath.replace("\\", "/");
 	}
 	
 	private static class ImagePair {
